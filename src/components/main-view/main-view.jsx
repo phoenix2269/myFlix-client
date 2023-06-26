@@ -1,68 +1,149 @@
-import { useState } from 'react';
-import { BookCard } from '../book-card/book-card';
-import { BookView } from '../book-view/book-view';
-
+import { useEffect, useState } from 'react';
+import { MovieCard } from '../movie-card/movie-card';
+import { MovieView } from '../movie-view/movie-view';
+import { LoginView } from '../login-view/login-view';
+import { SignupView } from '../signup-view/signup-view';
+import { NavigationBar } from '../navigation-bar/navigation-bar';
+import { ProfileView } from '../profile-view/profile-view';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 export const MainView = () => {
-    const [books, setBooks] = useState([
-        {
-          id: 1,
-          title: "Eloquent JavaScript",
-          image:
-            "https://images-na.ssl-images-amazon.com/images/I/51InjRPaF7L._SX377_BO1,204,203,200_.jpg",
-          author: "Marijn Haverbeke"
-        },
-        {
-          id: 2,
-          title: "Mastering JavaScript Functional Programming",
-          image:
-            "https://images-na.ssl-images-amazon.com/images/I/51WAikRq37L._SX218_BO1,204,203,200_QL40_FMwebp_.jpg",
-          author: "Federico Kereki"
-        },
-        {
-          id: 3,
-          title: "JavaScript: The Good Parts",
-          image:
-            "https://images-na.ssl-images-amazon.com/images/I/5131OWtQRaL._SX381_BO1,204,203,200_.jpg",
-          author: "Douglas Crockford"
-        },
-        {
-          id: 4,
-          title: "JavaScript: The Definitive Guide",
-          image:
-            "https://images-na.ssl-images-amazon.com/images/I/51HbNW6RzhL._SX218_BO1,204,203,200_QL40_FMwebp_.jpg",
-          author: "David Flanagan"
-        },
-        {
-          id: 5,
-          title: "The Road to React",
-          image:
-            "https://images-na.ssl-images-amazon.com/images/I/41MBLi5a4jL._SX384_BO1,204,203,200_.jpg",
-          author: "Robin Wieruch"
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedToken = localStorage.getItem("token");
+    const [user, setUser] = useState(storedUser ? storedUser : null);
+    const [token, setToken] = useState(storedToken ? storedToken : null);
+    const [movies, setMovies] = useState([]);
+//    const [selectedMovie, setSelectedMovie] = useState(null);
+
+    const updateUser = user => {
+        setUser(user);
+        localStorage.setItem("user", JSON.stringify(user));
+    }
+
+    useEffect(() => {
+        if (!token) {
+            return;
         }
-    ]);
 
-    const [selectedBook, setSelectedBook] = useState(null);
+        fetch("https://movie-api-cf.herokuapp.com/movies", {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then((response) => response.json())
+            .then((movies) => {
+//                setMovies(movies);
+                const moviesFromApi = movies.map((item) => {
+                    return {
+                    id: item._id,
+                    title: item.Title,
+                    image: item.ImagePath,
+                    year: item.ReleaseYear,
+                    rating: item.RottenTomatoes
+                    };
+                });
+                setMovies(moviesFromApi);
+            });
+    }, [token]);
 
-    if (selectedBook) {
-        return <BookView book={selectedBook} />;
-    }
-
-    if (books.length ===0) {
-        return <div>The list is empty!</div>
-    }
 
     return (
-        <div>
-            {books.map((book) => {
-                <BookCard
-                    key={book.id}
-                    book={book}
-                    onClick={() => {
-                        setSelectedBook(book);
-                    }}
-                />
-            })}
-        </div>
+        <BrowserRouter>
+            <NavigationBar
+                user={user}
+                onLoggedOut={() => {
+                    setUser(null);
+                    setToken(null);
+                    localStorage.clear();
+                }}
+            />
+            <Row className="justify-content-md-center">
+                <Routes>
+                    <Route
+                        path="/signup"
+                        element={
+                            <>
+                                {user ? (
+                                    <Navigate to="/" />
+                                ) : (
+                                    <Col md={5}>
+                                        <SignupView />
+                                    </Col>
+                                )}
+                            </>
+                        }
+                    />
+                    <Route
+                        path="/login"
+                        element={
+                            <>
+                                {user ? (
+                                    <Navigate to="/" />
+                                ) : (
+                                    <Col md={5}>
+                                        <LoginView
+                                            onLoggedIn={(user, token) => {
+                                                setUser(user);
+                                                setToken(token);
+                                            }}
+                                        />
+                                    </Col>
+                                )}
+                            </>
+                        }
+                    />
+                    <Route
+                        path="/movies/:movieId"
+                        element={
+                            <>
+                                {!user ? (
+                                    <Navigate to="/login" replace />
+                                ) : (
+                                    <Col md={8}>
+                                        <MovieView movies={movies} />
+                                    </Col>
+                                )}
+                            </>
+                        }
+                    />
+                    <Route
+                        path="/"
+                        element={
+                            <>
+                                {!user ? (
+                                    <Navigate to="/login" replace />
+                                ) : (
+                                    <>
+                                        {movies.map((movie) => (
+                                            <Col className="mb-4" key={movie.id} md={3}>
+                                                <MovieCard movie={movie} />
+                                            </Col>
+                                        ))}
+                                    </>
+                                )}
+                            </>
+                        }
+                    />
+                    <Route
+                        path="/profile"
+                        element={
+                            <>
+                                {!user ? (
+                                    <Navigate to="/login" replace />
+                                ) : (
+                                    <Col md={8}>
+                                        <ProfileView user={user} token={token} movies={movies} onLoggedOut={() => {
+                                            setUser(null);
+                                            setToken(null);
+                                            localStorage.clear();
+                                        }} updateUser={updateUser} />
+                                    </Col>
+                                )}
+                            </>
+                        }
+                    />
+                </Routes>
+            </Row>
+        </BrowserRouter>
     );
 };
