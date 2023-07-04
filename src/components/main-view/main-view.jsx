@@ -15,12 +15,68 @@ export const MainView = () => {
     const [user, setUser] = useState(storedUser ? storedUser : null);
     const [token, setToken] = useState(storedToken ? storedToken : null);
     const [movies, setMovies] = useState([]);
-//    const [selectedMovie, setSelectedMovie] = useState(null);
 
     const updateUser = user => {
         setUser(user);
         localStorage.setItem("user", JSON.stringify(user));
-    }
+    };
+
+    const handleAddToFavorites = (movieId) => {
+        // Updated user with new favorited movie
+        const updatedUser = {
+            ...user,
+            FavoriteMovies: [...user.FavoriteMovies, movieId]
+        };
+
+        // Put request to add movie to favorite list
+        fetch(`https://movie-api-cf.herokuapp.com/users/${user.Username}/movies/${movieId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then ((response) => {
+            if (response.ok) {
+                alert("Added Movie to Favorites List!");
+            } else {
+                alert("Error Adding Movie to Favorites List!");
+            }
+        });
+    };
+
+    const handleLogout = () => {
+        setUser(null);
+        setToken(null);
+        localStorage.clear();
+    };
+
+    const deleteFavorite = (movieId) => {
+        console.log("Movie ID :", movieId);
+        // Delete request to remove movie from favorite list
+        fetch(`https://movie-api-cf.herokuapp.com/users/${user.Username}/movies/${movieId}`, {
+        //     headers: { Authorization: `Bearer ${token}` }
+        // })
+        //     .then((response) => response.json())
+        //     .then((data) => {
+        //         console.log("Returned data", data);
+        //     })
+        //     .catch((error) => {
+        //         console.log('Error fetching movies:", error');
+        //     });
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then ((response) => {
+            if (response.ok) {
+                alert("Removed Movie from Favorites!");
+            } else {
+                alert("Error Removing Movie from Favorites!");
+            }
+        });
+    };
 
     useEffect(() => {
         if (!token) {
@@ -32,30 +88,38 @@ export const MainView = () => {
         })
             .then((response) => response.json())
             .then((movies) => {
-//                setMovies(movies);
-                const moviesFromApi = movies.map((item) => {
+                const moviesFromApi = movies.map((movie) => {
                     return {
-                    id: item._id,
-                    title: item.Title,
-                    image: item.ImagePath,
-                    year: item.ReleaseYear,
-                    rating: item.RottenTomatoes
+                    id: movie._id,
+                    title: movie.Title,
+                    description: movie.Description,
+                    genre: {
+                        name: movie.Genre.Name,
+                        description: movie.Genre.Description
+                    },
+                    director: {
+                        name: movie.Director.Name,
+                        bio: movie.Director.Bio,
+                        birthYear: movie.Director.Birth,
+                        deathYear: movie.Director.Death
+                    },
+                    image: movie.ImagePath,
+                    year: movie.ReleaseYear,
+                    rating: movie.RottenTomatoes
                     };
                 });
                 setMovies(moviesFromApi);
+            })
+            .catch((error) => {
+                console.log('Error fetching movies:", error');
             });
     }, [token]);
-
 
     return (
         <BrowserRouter>
             <NavigationBar
                 user={user}
-                onLoggedOut={() => {
-                    setUser(null);
-                    setToken(null);
-                    localStorage.clear();
-                }}
+                onLoggedOut={handleLogout}
             />
             <Row className="justify-content-md-center">
                 <Routes>
@@ -100,7 +164,7 @@ export const MainView = () => {
                                     <Navigate to="/login" replace />
                                 ) : (
                                     <Col md={8}>
-                                        <MovieView movies={movies} />
+                                        <MovieView movies={movies} onAddToFavorites={handleAddToFavorites} />
                                     </Col>
                                 )}
                             </>
@@ -132,11 +196,14 @@ export const MainView = () => {
                                     <Navigate to="/login" replace />
                                 ) : (
                                     <Col md={8}>
-                                        <ProfileView user={user} token={token} movies={movies} onLoggedOut={() => {
-                                            setUser(null);
-                                            setToken(null);
-                                            localStorage.clear();
-                                        }} updateUser={updateUser} />
+                                        <ProfileView
+                                            user={user}
+                                            token={token}
+                                            movies={movies}
+                                            onLoggedOut={handleLogout}
+                                            updateUser={updateUser}
+                                            onRemoveFavorite={deleteFavorite}
+                                        />
                                     </Col>
                                 )}
                             </>
