@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import './movie-view.scss';
 
-export const MovieView = ({ movies }) => {
+export const MovieView = ({ movies, onAddToFavorites }) => {
     const { movieId } = useParams();
     const movie = movies.find((b) => b.id === movieId);
+    const handleAddToFavorites = () => {
+        onAddToFavorites(movie.id);
+    };
 
     return (
         <div>
@@ -27,6 +30,7 @@ export const MovieView = ({ movies }) => {
             <Link to={"/"}>
                 <Button className="back=button">Back</Button>
             </Link>
+            <Button variant="secondary" onClick={handleAddToFavorites}>Add to Favorites</Button>
         </div>
     );
 };
