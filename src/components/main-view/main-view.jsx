@@ -72,6 +72,7 @@ export const MainView = () => {
         .then ((response) => {
             if (response.ok) {
                 alert("Removed Movie from Favorites!");
+                window.location.reload();
             } else {
                 alert("Error Removing Movie from Favorites!");
             }
