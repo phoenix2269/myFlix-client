@@ -38,6 +38,6 @@ MovieCard.propTypes = {
         image: PropTypes.string.isRequired,
         year: PropTypes.string,
         rating: PropTypes.string
-    }).isRequired,
-    addToFavorites: PropTypes.func.isRequired
+    }).isRequired//,
+    // addToFavorites: PropTypes.func.isRequired
 };
