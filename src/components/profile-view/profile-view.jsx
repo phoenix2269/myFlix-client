@@ -43,24 +43,24 @@ export const ProfileView = ({ user, token, movies, onLoggedOut, updateUser, onRe
     const handleUpdate = (event) => {
         event.preventDefault();
 
-/*         const data = {
+        const data = {
             Username: username,
             Password: password,
             Email: email,
             Birthday: birthday
-        }; */
+        };
 
-        const data = {};
+        // const data = {};
 
-        storedUser.Username !== username
-            ? data.Username = username
-            : storedUser.Password !== password
-            ? data.Password = password
-            : storedUser.Email !== email
-            ? data.Email = email
-            : storedUser.Birthday !== birthday
-            ? data.Birthday = birthday
-            : alert ("Nothing to change!");
+        // storedUser.Username !== username
+        //     ? data.Username = username
+        //     : storedUser.Password !== password
+        //     ? data.Password = password
+        //     : storedUser.Email !== email
+        //     ? data.Email = email
+        //     : storedUser.Birthday !== birthday
+        //     ? data.Birthday = birthday
+        //     : alert ("Nothing to change!");
 
         console.log("profile-view data: ", JSON.stringify(data));
 
@@ -155,8 +155,8 @@ export const ProfileView = ({ user, token, movies, onLoggedOut, updateUser, onRe
             movies
                 .filter((m) => favoriteMovies.includes(m.id))
                 .map((m) => (
-                <>
-                    <Col className="mb-10" md={3} key={encodeURIComponent(m.id)}>
+                    <>
+                    <Col className="mb-10" md={3} key={m.id}>
                         <MovieCard movie={m} />
                         <Button variant="danger" onClick={() => onRemoveFavorite(m.id)}>Remove</Button>
 {/*                         <Card className="h-100">
