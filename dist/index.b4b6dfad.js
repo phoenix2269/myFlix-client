@@ -27229,8 +27229,10 @@ const MainView = ()=>{
                 Authorization: `Bearer ${token}`
             }
         }).then((response)=>{
-            if (response.ok) alert("Removed Movie from Favorites!");
-            else alert("Error Removing Movie from Favorites!");
+            if (response.ok) {
+                alert("Removed Movie from Favorites!");
+                window.location.reload();
+            } else alert("Error Removing Movie from Favorites!");
         });
     };
     (0, _react.useEffect)(()=>{
@@ -27274,7 +27276,7 @@ const MainView = ()=>{
                 onLoggedOut: handleLogout
             }, void 0, false, {
                 fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 120,
+                lineNumber: 121,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _rowDefault.default), {
@@ -27293,7 +27295,7 @@ const MainView = ()=>{
                             }, void 0, false)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 126,
+                            lineNumber: 127,
                             columnNumber: 21
                         }, undefined),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
@@ -27313,7 +27315,7 @@ const MainView = ()=>{
                             }, void 0, false)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 140,
+                            lineNumber: 141,
                             columnNumber: 21
                         }, undefined),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
@@ -27332,7 +27334,7 @@ const MainView = ()=>{
                             }, void 0, false)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 159,
+                            lineNumber: 160,
                             columnNumber: 21
                         }, undefined),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
@@ -27353,7 +27355,7 @@ const MainView = ()=>{
                             }, void 0, false)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 173,
+                            lineNumber: 174,
                             columnNumber: 21
                         }, undefined),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
@@ -27376,24 +27378,24 @@ const MainView = ()=>{
                             }, void 0, false)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 191,
+                            lineNumber: 192,
                             columnNumber: 21
                         }, undefined)
                     ]
                 }, void 0, true, {
                     fileName: "src/components/main-view/main-view.jsx",
-                    lineNumber: 125,
+                    lineNumber: 126,
                     columnNumber: 17
                 }, undefined)
             }, void 0, false, {
                 fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 124,
+                lineNumber: 125,
                 columnNumber: 13
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "src/components/main-view/main-view.jsx",
-        lineNumber: 119,
+        lineNumber: 120,
         columnNumber: 9
     }, undefined);
 };
@@ -27477,8 +27479,7 @@ MovieCard.propTypes = {
         image: (0, _propTypesDefault.default).string.isRequired,
         year: (0, _propTypesDefault.default).string,
         rating: (0, _propTypesDefault.default).string
-    }).isRequired,
-    addToFavorites: (0, _propTypesDefault.default).func.isRequired
+    }).isRequired //,
 };
 var _c;
 $RefreshReg$(_c, "MovieCard");
@@ -46923,13 +46924,22 @@ const ProfileView = ({ user , token , movies , onLoggedOut , updateUser , onRemo
     ]);
     const handleUpdate = (event)=>{
         event.preventDefault();
-        /*         const data = {
+        const data = {
             Username: username,
             Password: password,
             Email: email,
             Birthday: birthday
-        }; */ const data = {};
-        storedUser.Username !== username ? data.Username = username : storedUser.Password !== password ? data.Password = password : storedUser.Email !== email ? data.Email = email : storedUser.Birthday !== birthday ? data.Birthday = birthday : alert("Nothing to change!");
+        };
+        // const data = {};
+        // storedUser.Username !== username
+        //     ? data.Username = username
+        //     : storedUser.Password !== password
+        //     ? data.Password = password
+        //     : storedUser.Email !== email
+        //     ? data.Email = email
+        //     : storedUser.Birthday !== birthday
+        //     ? data.Birthday = birthday
+        //     : alert ("Nothing to change!");
         console.log("profile-view data: ", JSON.stringify(data));
         // Update/Edit Account
         fetch(`https://movie-api-cf.herokuapp.com/users/${user.Username}`, {
@@ -47128,7 +47138,7 @@ const ProfileView = ({ user , token , movies , onLoggedOut , updateUser , onRemo
                                         columnNumber: 25
                                     }, undefined)
                                 ]
-                            }, encodeURIComponent(m.id), true, {
+                            }, m.id, true, {
                                 fileName: "src/components/profile-view/profile-view.jsx",
                                 lineNumber: 159,
                                 columnNumber: 21
