@@ -7,6 +7,7 @@ import { NavigationBar } from '../navigation-bar/navigation-bar';
 import { ProfileView } from '../profile-view/profile-view';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
+import Form from "react-bootstrap/Form";
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 export const MainView = () => {
@@ -15,6 +16,7 @@ export const MainView = () => {
     const [user, setUser] = useState(storedUser ? storedUser : null);
     const [token, setToken] = useState(storedToken ? storedToken : null);
     const [movies, setMovies] = useState([]);
+    const [filter, setFilter] = useState("");
 
     const updateUser = user => {
         setUser(user);
@@ -179,11 +181,28 @@ export const MainView = () => {
                                     <Navigate to="/login" replace />
                                 ) : (
                                     <>
-                                        {movies.map((movie) => (
-                                            <Col className="mb-4" key={movie.id} md={3}>
-                                                <MovieCard movie={movie} />
-                                            </Col>
-                                        ))}
+                                        <Row className="mt-1 mb-1">
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Search..."
+                                                value={filter}
+                                                onChange={(e) => setFilter(e.target.value)}
+                                            />
+                                        </Row>
+                                        {movies.length === 0 ? (
+                                            <Col>The list is empty!</Col>
+                                        ) : (
+                                            movies
+                                                .filter((movie) => movie.title
+                                                    .toLowerCase()
+                                                    .includes(filter.toLowerCase())
+                                                )
+                                                .map((movie) => (
+                                                    <Col className="mb-4" key={movie.id} md={3}>
+                                                        <MovieCard movie={movie} />
+                                                    </Col>
+                                                ))
+                                        )}
                                     </>
                                 )}
                             </>
